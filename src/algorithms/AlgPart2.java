@@ -2,7 +2,9 @@ package algorithms;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Stack;
+import java.util.stream.IntStream;
 
 public class AlgPart2 {
     public static void main(String[] args) {
@@ -12,6 +14,9 @@ public class AlgPart2 {
         System.out.println("Min path sum start");
         System.out.println("Result: " + minPathSum(new int[][]{{1, 3, 1}, {1, 5, 1}, {4, 2, 1}}));
         System.out.println("Min path sum end");
+        System.out.println("Pacific Atlantic start");
+        System.out.println("Result: " + pacificAtlantic(new int[][]{{1, 2, 2, 3, 5}, {3, 2, 3, 4, 4}, {2, 4, 5, 3, 1}, {6, 7, 1, 4, 5}, {5, 1, 1, 2, 4}}));
+        System.out.println("Pacific Atlantic  end");
     }
 
     public static int maxArea(int[] height) {
@@ -182,6 +187,42 @@ public class AlgPart2 {
 
         BigInteger bBig = new BigInteger(bStr.toString());
         return aBig.modPow(bBig, modBig).intValue();
+    }
+
+    public static List<List<Integer>> pacificAtlantic(int[][] heights) {
+        int rowsLen = heights.length;
+        int colsLen = heights[0].length;
+        boolean[][] pac = new boolean[rowsLen][colsLen];
+        boolean[][] atl = new boolean[rowsLen][colsLen];
+
+        for (int row = 0; row < rowsLen; row++) {
+            dfs(row, 0, rowsLen, colsLen, pac, heights[row][0], heights);
+            dfs(row, colsLen - 1, rowsLen, colsLen, atl, heights[row][colsLen - 1], heights);
+        }
+
+        for (int col = 0; col < colsLen; col++) {
+            dfs(0, col, rowsLen, colsLen, pac, heights[0][col], heights);
+            dfs(rowsLen - 1, col, rowsLen, colsLen, atl, heights[rowsLen - 1][col], heights);
+        }
+
+        return IntStream.range(0, rowsLen)
+                .boxed()
+                .flatMap(row -> IntStream.range(0, colsLen)
+                        .filter(col -> pac[row][col] && atl[row][col])
+                        .mapToObj(col -> List.of(row, col)))
+                .toList();
+    }
+
+    private static void dfs(int row, int col, int rowsLen, int colsLen, boolean[][] visited, int prevHeight, int[][] heights) {
+        if (row < 0 || row >= rowsLen || col < 0 || col >= colsLen || visited[row][col] || prevHeight > heights[row][col]) {
+            return;
+        }
+
+        visited[row][col] = true;
+        dfs(row, col + 1, rowsLen, colsLen, visited, heights[row][col], heights);
+        dfs(row + 1, col, rowsLen, colsLen, visited, heights[row][col], heights);
+        dfs(row, col - 1, rowsLen, colsLen, visited, heights[row][col], heights);
+        dfs(row - 1, col, rowsLen, colsLen, visited, heights[row][col], heights);
     }
 
     private static int getArea(int leftEndpointIndex, int rightEndpointIndex, int[] height) {
