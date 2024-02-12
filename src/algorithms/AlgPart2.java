@@ -195,15 +195,15 @@ public class AlgPart2 {
         boolean[][] pac = new boolean[rowsLen][colsLen];
         boolean[][] atl = new boolean[rowsLen][colsLen];
 
-        for (int row = 0; row < rowsLen; row++) {
+        IntStream.range(0, rowsLen).forEach(row -> {
             dfs(row, 0, rowsLen, colsLen, pac, heights[row][0], heights);
             dfs(row, colsLen - 1, rowsLen, colsLen, atl, heights[row][colsLen - 1], heights);
-        }
+        });
 
-        for (int col = 0; col < colsLen; col++) {
+        IntStream.range(0, colsLen).forEach(col -> {
             dfs(0, col, rowsLen, colsLen, pac, heights[0][col], heights);
             dfs(rowsLen - 1, col, rowsLen, colsLen, atl, heights[rowsLen - 1][col], heights);
-        }
+        });
 
         return IntStream.range(0, rowsLen)
                 .boxed()
